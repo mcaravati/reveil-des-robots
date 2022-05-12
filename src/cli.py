@@ -53,11 +53,11 @@ def read_file(file_path, N):
                 for i in range(x1, x2 + 1):
                     for j in range(y1, y2 + 1):
                         graph.set_node_type((i, j), 'X')
-
             else:
                 # Add the element to the graph
                 for position in tuples:
-                    graph.set_node_type(position, element)
+                    if graph.nodes[position].type != 'R':
+                        graph.set_node_type(position, element)
 
     return graph
 
