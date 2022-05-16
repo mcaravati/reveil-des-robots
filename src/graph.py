@@ -142,3 +142,33 @@ class Graph:
             for i in range(width):
                 for j in range(height):
                     self.set_node_type((x + i, y + j), "X")
+
+    def print_path(self, path: List[Tuple[int, int]]) -> None:
+        # We print the node a different color for each type
+        for node in self.nodes:
+            # If the node is a robot, we print it in red
+            if self.nodes[node].type == "R":
+                plt.plot(node[0], node[1], "ro")
+
+            # If the node is an obstacle, we print it in blue
+            elif self.nodes[node].type == "X":
+                plt.plot(node[0], node[1], "bo")
+
+            # If the node is a constraint, we print it in green
+            elif self.nodes[node].type == "E":
+                plt.plot(node[0], node[1], "go")
+
+            # If the node is another robot, we print it in black
+            elif self.nodes[node].type and self.nodes[node].type.isnumeric():
+                plt.plot(node[0], node[1], "yo")
+
+        # We print the edges
+        for edge in self.graph:
+            for neighbor in self.graph[edge]:
+                plt.plot([edge[0], neighbor[0]], [edge[1], neighbor[1]], "k-")
+
+        # We print the path
+        for i in range(len(path) - 1):
+            plt.plot([path[i][0], path[i + 1][0]], [path[i][1], path[i + 1][1]], "r-")
+
+        plt.show()
