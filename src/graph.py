@@ -31,6 +31,8 @@ class Graph:
         # for further purpose
         self.N: int = N
 
+        self.R = None
+
         # Graph store the position the neighbors of each vertex
         # ex: (0, 0): [(0, 1), (1, 0)]
         self.graph: Dict[Tuple[int, int], List[Tuple[int, int]]] = {}

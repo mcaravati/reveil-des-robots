@@ -54,6 +54,9 @@ def read_file(file_path, N):
                     for j in range(y1, y2 + 1):
                         graph.set_node_type((i, j), 'X')
             else:
+                if element == 'R':
+                    graph.R = tuples[0]
+
                 # Add the element to the graph
                 for position in tuples:
                     if graph.nodes[position].type != 'R':
@@ -70,4 +73,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     graph = read_file(args.file_path, args.N)
+
+    graph.generate_random_obstacles(3)
     graph.print()
