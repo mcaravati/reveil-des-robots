@@ -9,7 +9,7 @@ import argparse
 def get_Drobot_position(Graph): 
     for i in range(0,Graph.N): 
         for j in range(0,Graph.N): 
-            if (Graph.nodes[(i,j)].type != None): 
+            if (Graph.nodes[(i,j)].type != 'R'): 
                 return (i,j)
 
 #Get indexes of other Robots
