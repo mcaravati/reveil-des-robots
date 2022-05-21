@@ -66,7 +66,7 @@ def Astar(s : Node,t: Node ,G : Graph):
     NOIR = []
     while True :
         if len(GRIS)==0 :
-            return (False,d,parent);
+            return (False,d,parents);
         x = extractDandhMin(GRIS,d,G);
         if x==t:
             return (True,d,parents)
@@ -97,6 +97,7 @@ def get_close_robot(Drobot ,robots):
 
 def wake_robots(file_path, N):
     G = read_file(file_path, N)
+    G.generate_random_obstacles(5)
     Robots = get_Robots_positions(G)
     s = G.R
     way = []
