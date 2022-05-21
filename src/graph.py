@@ -79,31 +79,31 @@ class Graph:
         self.nodes[node].type = type
 
     def print(self):
+        fig, ax = plt.subplots()
         # We print the node a different color for each type
         for node in self.nodes:
             # If the node is a robot, we print it in red
             if self.nodes[node].type == "R":
-                plt.plot(node[0], node[1], "ro")
+                ax.plot(node[0], node[1], "ro")
 
             # If the node is an obstacle, we print it in blue
             elif self.nodes[node].type == "X":
-                plt.plot(node[0], node[1], "bo")
+                ax.plot(node[0], node[1], "bo")
 
             # If the node is a constraint, we print it in green
             elif self.nodes[node].type == "E":
-                plt.plot(node[0], node[1], "go")
+                ax.plot(node[0], node[1], "go")
 
             # If the node is another robot, we print it in black
             elif self.nodes[node].type and self.nodes[node].type.isnumeric():
-                plt.plot(node[0], node[1], "yo")
+                ax.plot(node[0], node[1], "yo")
 
         # We print the edges
         for edge in self.graph:
             for neighbor in self.graph[edge]:
-                plt.plot([edge[0], neighbor[0]], [edge[1], neighbor[1]], "k-")
-
-        plt.show()
-
+                ax.plot([edge[0], neighbor[0]], [edge[1], neighbor[1]], "k-")
+        return fig, ax
+    
     def add_constraint(self, constraint):
         self.constraints.append(constraint)
 
@@ -145,32 +145,44 @@ class Graph:
                 for j in range(height):
                     self.set_node_type((x + i, y + j), "X")
 
-    def print_path(self, path: List[Tuple[int, int]]) -> None:
-        # We print the node a different color for each type
-        for node in self.nodes:
-            # If the node is a robot, we print it in red
-            if self.nodes[node].type == "R":
-                plt.plot(node[0], node[1], "ro")
+    def print_path(self, fig, ax, path: List[Tuple[int, int]], c) -> None:
+        # # We print the node a different color for each type
+        # for node in self.nodes:
+        #     # If the node is a robot, we print it in red
+        #     if self.nodes[node].type == "R":
+        #         ax.plot(node[0], node[1], "ro")
 
-            # If the node is an obstacle, we print it in blue
-            elif self.nodes[node].type == "X":
-                plt.plot(node[0], node[1], "bo")
+        #     # If the node is an obstacle, we print it in blue
+        #     elif self.nodes[node].type == "X":
+        #         ax.plot(node[0], node[1], "bo")
 
-            # If the node is a constraint, we print it in green
-            elif self.nodes[node].type == "E":
-                plt.plot(node[0], node[1], "go")
+        #     # If the node is a constraint, we print it in green
+        #     elif self.nodes[node].type == "E":
+        #         ax.plot(node[0], node[1], "go")
 
-            # If the node is another robot, we print it in black
-            elif self.nodes[node].type and self.nodes[node].type.isnumeric():
-                plt.plot(node[0], node[1], "yo")
+        #     # If the node is another robot, we print it in black
+        #     elif self.nodes[node].type and self.nodes[node].type.isnumeric():
+        #         ax.plot(node[0], node[1], "yo")
 
-        # We print the edges
-        for edge in self.graph:
-            for neighbor in self.graph[edge]:
-                plt.plot([edge[0], neighbor[0]], [edge[1], neighbor[1]], "k-")
+        # # We print the edges
+        # for edge in self.graph:
+        #     for neighbor in self.graph[edge]:
+        #         ax.plot([edge[0], neighbor[0]], [edge[1], neighbor[1]], "k-")
 
         # We print the path
         for i in range(len(path) - 1):
-            plt.plot([path[i][0], path[i + 1][0]], [path[i][1], path[i + 1][1]], "r-")
+            ax.plot([path[i][0], path[i + 1][0]], [path[i][1], path[i + 1][1]], f"{c}-", linewidth=4)
+            
+        return fig, ax
 
-        plt.show()
+    def print_paths(self, paths: list[List[Tuple[int, int]]]) -> None:
+        fig, ax = self.print()
+        for i in range(0,len(paths)) :
+            if (i==0) :
+                c = "r"
+            elif ((i)%4==1 or (i)%4==2):
+                c = "g"
+            else :
+                c = "b"
+            fig, ax = self.print_path(fig, ax, paths[i], c)
+        return fig, ax

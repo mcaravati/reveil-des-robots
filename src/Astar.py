@@ -1,5 +1,7 @@
 from graph import Graph, Node
 from cli import read_file
+import numpy as np
+import matplotlib.pyplot as plt
 
 def initialisation(s : Node,G : Graph):
     d,parents = {},{}
@@ -33,9 +35,16 @@ def colorNOIR(y, GRIS, NOIR):
         NOIR.append(y)
     return GRIS, NOIR
 
-def h(x):
-    return 0
-def extractDandhMin(GRIS,d,G):
+def h(t : Node):
+    def h_0(x : Node):
+        return 0
+    def h_euclidian(x : Node):
+        return np.sqrt((t[0]-x[0])**2 + (t[1]-x[1])**2)
+    def h_Manhattan(x : Node):
+        return np.abs(t[0]-x[0]) + np.abs(t[1]-x[1])
+    return [h_0, h_Manhattan, h_euclidian]
+
+def extractDandhMin(GRIS,d,G,h):
     dmin = float("inf")
     xmin = GRIS[0]
     for x in GRIS :
@@ -52,7 +61,7 @@ def releaseAstar(e,G,d,parent,GRIS,NOIR):
         GRIS, NOIR = colorGRIS(y,GRIS,NOIR)
     return d, parent, GRIS, NOIR
 
-def wayTo(parents,s,t):
+def wayTo(parents, s, t):
     way = [t]
     i=1
     while way[0] != s :
@@ -60,14 +69,14 @@ def wayTo(parents,s,t):
         i+=1
     return way
 
-def Astar(s : Node,t: Node ,G : Graph): 
+def Astar(s : Node,t: Node ,G : Graph, hID : int): 
     d,parents = initialisation(s,G);
     GRIS = [s];
     NOIR = []
     while True :
         if len(GRIS)==0 :
             return (False,d,parent);
-        x = extractDandhMin(GRIS,d,G);
+        x = extractDandhMin(GRIS,d,G,h(t)[hID]);
         if x==t:
             return (True,d,parents)
         L = G.get_neighbors(x)
@@ -95,15 +104,71 @@ def get_close_robot(Drobot ,robots):
         l.append((abs(Drobot[0] - robots[i][0])+(abs(Drobot[1] - robots[i][1]))))
     return robots[l.index(min(l))]
 
-def wake_robots(file_path, N):
+def wake_robots_alone(file_path, N, hID):
     G = read_file(file_path, N)
     Robots = get_Robots_positions(G)
     s = G.R
-    way = []
-    for t in Robots :
-        way += wayTo(Astar(s,t,G)[2],s,t)
-        s = t
-    G.print_path(way)
+    Robots.sort(key=h(s)[hID])
 
+    way = []
+    while Robots != []:
+        t = Robots.pop(0)
+        way += wayTo(Astar(s,t,G,hID)[2],s,t)
+        s = t
+        Robots.sort(key=h(s)[hID])
+    
+    G.print_paths([way])
+    plt.savefig(f"img/AstarAlone{hID}.png",dpi=300,bbox_inches="tight", pad_inches=0.1)
+
+def wake_robots_with_help(file_path, N, hID):
+    Paths = []
+    def wake_robots_with_help_rec(r):
+        if r==G.R or len(Robots) == 1:
+            t = Robots.pop(0)
+            Paths.append(wayTo(Astar(r,t,G,hID)[2],r,t))
+            Robots.sort(key=h(r)[1])
+            if r==G.R :
+                wake_robots_with_help_rec(t)
+        elif len(Robots) > 1:
+            t1, t2 = Robots.pop(0), Robots.pop(0)
+
+            Paths.append(wayTo(Astar(r,t1,G,hID)[2],r,t1))
+            Paths.append(wayTo(Astar(r,t2,G,hID)[2],r,t2))
+            Robots.sort(key=h(r)[1])
+
+            wake_robots_with_help_rec(t1)
+            wake_robots_with_help_rec(t2)
+
+    G = read_file(file_path, N)
+    Robots = get_Robots_positions(G)
+    r = G.R
+    Robots.sort(key=h(r)[1])
+    wake_robots_with_help_rec(r)
+    
+    G.print_paths(Paths)
+    plt.savefig(f"img/AstarWithOthers{hID}.png",dpi=300,bbox_inches="tight", pad_inches=0.1)
+
+def measure():
+    Distances=[]
+    K=10
+    d = []
+    G = read_file(f"graph_{K}.txt", 1000)
+    Robots = get_Robots_positions(G)
+    s = G.R
+    Robots.sort(key=h(s)[1])
+
+    way = []
+    while Robots != []:
+        t = Robots.pop(0)
+        way.append(wayTo(Astar(s,t,G,1)[2],s,t))
+        s = t
+        Robots.sort(key=h(s)[1])
+    print(len(way))
+    
 if __name__ ==  "__main__" :
-    wake_robots('graph.txt', 60)
+    wake_robots_alone("graph.txt",45,0)
+    wake_robots_alone("graph.txt",45,1)
+    wake_robots_alone("graph.txt",45,2)
+
+    wake_robots_with_help("graph.txt",45,1)
+    wake_robots_with_help("graph.txt",45,2)
