@@ -106,6 +106,7 @@ def get_close_robot(Drobot ,robots):
 
 def wake_robots_alone(file_path, N, hID):
     G = read_file(file_path, N)
+    G.generate_random_obstacles(5)
     Robots = get_Robots_positions(G)
     s = G.R
     Robots.sort(key=h(s)[hID])
