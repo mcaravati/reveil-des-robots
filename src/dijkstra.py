@@ -89,3 +89,4 @@ if __name__ == '__main__':
     grey1 = []
     Multiple_reveil_Robot(grid, Drobot, Orobots1, trajet1)
     print("movements for each robot: ", trajet1)
+    grid.print_path(trajet1)
