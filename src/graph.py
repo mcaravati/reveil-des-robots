@@ -170,7 +170,16 @@ class Graph:
                 plt.plot([edge[0], neighbor[0]], [edge[1], neighbor[1]], "k-")
 
         # We print the path
-        for i in range(len(path) - 1):
-            plt.plot([path[i][0], path[i + 1][0]], [path[i][1], path[i + 1][1]], "r-")
-
+        if (type(path) == list) :
+            for i in range(len(path) - 1):
+                plt.plot([path[i][0], path[i + 1][0]], [path[i][1], path[i + 1][1]], "r-")
+        else :  
+            colors = ["r-", "yo-", "go-", "k-"]
+            j = 0
+            for keys in path.keys() :
+                first = keys
+                for i in range(len(path[keys])):
+                    plt.plot([first[0], path[keys][i][0]], [first[1], path[keys][i][1]], colors[j])
+                    first = path[keys][i]
+                j+=1   
         plt.show()
